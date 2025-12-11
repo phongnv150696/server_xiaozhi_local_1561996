@@ -1,0 +1,31 @@
+# -*- coding:utf-8 -*-
+#--------- xiaozhi-local-chat requirements - chỉ dành cho local AI chat
+#--------- Python 3.10+ recommended
+
+# Core dependencies
+websockets==14.2
+numpy==1.26.4
+ruamel.yaml==0.18.16
+loguru==0.7.3
+aioconsole==0.8.2
+psutil==7.0.0
+
+# Audio processing
+opuslib_next==1.1.5
+pydub==0.25.1
+torchaudio==2.2.2
+
+# Local AI models
+torch==2.2.2
+funasr==1.2.7
+modelscope==1.23.2
+silero_vad==6.1.0
+
+# Ollama integration
+httpx==0.28.1
+
+# Text-to-speech (local)
+edge_tts==7.2.3
+
+# Utility
+Jinja2==3.1.6

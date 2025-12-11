@@ -1,0 +1,155 @@
+# Cấu hình xiaozhi-local-chat - Chat AI local với tiếng Việt
+# Dự án được tối ưu hóa để chạy hoàn toàn offline với Ollama
+
+# #####################################################################################
+# ############################# CẤU HÌNH SERVER CƠ BẢN ####################################
+server:
+  ip: 0.0.0.0
+  port: 8000
+  http_port: 8003
+  auth:
+    enabled: false
+  log:
+    log_format: "<green>{time:YYMMDD HH:mm:ss}</green>[{version}_{selected_module}][<light-blue>{extra[tag]}</light-blue>]-<level>{level}</level>-<light-green>{message}</light-green>"
+    log_level: INFO
+    log_dir: tmp
+    log_file: "server.log"
+    data_dir: data
+
+# Cấu hình cơ bản
+delete_audio: true
+close_connection_no_voice_time: 120
+tts_timeout: 10
+enable_wakeup_words_response_cache: true
+enable_greeting: true
+enable_stop_tts_notify: false
+
+# TTS audio delay cho streaming
+tts_audio_send_delay: 0
+
+# Exit commands
+exit_commands:
+  - "thoát"
+  - "kết thúc"
+  - "dừng"
+
+# Cấu hình giao thức xiaozhi
+xiaozhi:
+  type: hello
+  version: 1
+  transport: websocket
+  audio_params:
+    format: opus
+    sample_rate: 16000
+    channels: 1
+    frame_duration: 60
+
+# Module test (tùy chọn)
+module_test:
+  test_sentences:
+    - "Xin chào, bạn có thể giới thiệu về mình không?"
+    - "Hôm nay thời tiết như thế nào?"
+    - "Hãy giải thích về trí tuệ nhân tạo bằng tiếng Việt"
+
+# Wakeup words cho tiếng Việt
+wakeup_words:
+  - "xin chào trợ lý"
+  - "hey trợ lý"
+  - "kích hoạt trợ lý"
+  - "bắt đầu chat"
+
+# #####################################################################################
+# ##################################### PROMPT ######################################
+
+# Prompt chính cho trợ lý tiếng Việt
+prompt: |
+  Bạn là một trợ lý AI thông minh, thân thiện, hỗ trợ người dùng bằng tiếng Việt.
+
+  **Đặc điểm tính cách:**
+  - Luôn trả lời bằng tiếng Việt một cách tự nhiên, thân thiện
+  - Giải thích rõ ràng, dễ hiểu
+  - Trung thực và chính xác trong thông tin
+  - Thân thiện, hỗ trợ người dùng
+
+  **Khả năng:**
+  - Trả lời các câu hỏi chung
+  - Giải thích khái niệm
+  - Hỗ trợ học tập và làm việc
+  - Tư vấn và gợi ý ý tưởng
+
+  **Nguyên tắc:**
+  - Luôn giữ thái độ tích cực
+  - Không đưa ra thông tin sai lệch
+  - Tôn trọng quyền riêng tư của người dùng
+  - Khuyến khích tư duy phản biện
+
+# Default prompt template
+prompt_template: agent-base-prompt.txt
+
+# End prompt
+end_prompt:
+  enable: true
+  prompt: |
+    Cảm ơn bạn đã trò chuyện cùng tôi. Hẹn gặp lại bạn lần sau!
+
+# #####################################################################################
+# ################################## MODULE SELECTION #################################
+
+selected_module:
+  VAD: SileroVAD
+  ASR: FunASR
+  LLM: OllamaLLM
+  TTS: EdgeTTS
+  Memory: nomem
+  Intent: nointent
+
+# #####################################################################################
+# #################################### PROVIDERS #####################################
+
+# VAD Configuration - SileroVAD cho streaming
+VAD:
+  SileroVAD:
+    type: silero
+    threshold: 0.5
+    threshold_low: 0.3
+    model_dir: models/snakers4_silero-vad
+    min_silence_duration_ms: 200
+
+# ASR Configuration - FunASR local với SenseVoice (hỗ trợ tiếng Việt)
+ASR:
+  FunASR:
+    type: fun_local
+    model_dir: models/SenseVoiceSmall
+    output_dir: tmp/
+
+# LLM Configuration - Ollama local
+LLM:
+  OllamaLLM:
+    type: ollama
+    model_name: "qwen2.5:7b"  # Model hỗ trợ tiếng Việt tốt, có thể thay bằng llama3.2:3b cho hiệu năng
+    base_url: http://localhost:11434  # Ollama default port
+    temperature: 0.7
+    max_tokens: 1024
+    top_p: 0.9
+
+# TTS Configuration - EdgeTTS với giọng tiếng Việt
+TTS:
+  EdgeTTS:
+    type: edge
+    voice: "vi-VN-HoaiMyNeural"  # Giọng nữ tiếng Việt
+    # Các giọng tiếng Việt khác:
+    # vi-VN-NamMinhNeural (nam)
+    # vi-VN-HoaiMyNeural (nữ)
+    # vi-VN-HuongTrangNeural (nữ)
+    output_dir: tmp/
+
+# Memory Configuration - Không sử dụng memory
+Memory:
+  nomem:
+    type: nomem
+
+# Intent Configuration - Không sử dụng intent phức tạp
+Intent:
+  nointent:
+    type: nointent
+
